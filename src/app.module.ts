@@ -3,21 +3,21 @@ import { AppController } from "./app.controller";
 import { AppService } from "./app.service";
 import { ProductsModule } from "./products/products.module";
 import { TypeOrmModule } from "@nestjs/typeorm";
-import { Product } from "./products/entities/product.entity";
+import { ConfigModule, ConfigService } from "@nestjs/config";
+import { dataSource } from "./shared/utils/data-source";
 
 @Module({
   imports: [
-    ProductsModule,
-    TypeOrmModule.forRoot({
-      type: "postgres",
-      host: "localhost",
-      port: 5432,
-      username: "admin",
-      password: "password",
-      database: "MOTOR_INSURANCE_WEBSITE",
-      entities: [Product], // Include your Product entity here
-      synchronize: true, // Automatically synchronize the database schema (disable in production)
+    ConfigModule.forRoot({
+      isGlobal: true, // Makes the ConfigService available globally
+      envFilePath: ".env", // Specifies the .env file location
     }),
+    TypeOrmModule.forRootAsync({
+      imports: [ConfigModule],
+      inject: [ConfigService],
+      useFactory: dataSource, // Load TypeORM configuration using factory function
+    }),
+    ProductsModule,
   ],
   controllers: [AppController],
   providers: [AppService],
