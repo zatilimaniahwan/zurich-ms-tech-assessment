@@ -1,10 +1,12 @@
-import { Module } from "@nestjs/common";
+import { MiddlewareConsumer, Module, NestModule } from "@nestjs/common";
 import { AppController } from "./app.controller";
-import { AppService } from "./app.service";
 import { ProductsModule } from "./products/products.module";
 import { TypeOrmModule } from "@nestjs/typeorm";
 import { ConfigModule, ConfigService } from "@nestjs/config";
 import { dataSource } from "./shared/utils/data-source";
+import { JwtModule } from "@nestjs/jwt";
+import { RoleMiddleware } from "./middleware/role.middleware";
+import { JwtStrategy } from "./jwt/jwt.strategy";
 
 @Module({
   imports: [
@@ -17,9 +19,17 @@ import { dataSource } from "./shared/utils/data-source";
       inject: [ConfigService],
       useFactory: dataSource, // Load TypeORM configuration using factory function
     }),
+    JwtModule.register({
+      secret: process.env.JWT_SECRET,
+      signOptions: { expiresIn: "1d" },
+    }),
     ProductsModule,
   ],
   controllers: [AppController],
-  providers: [AppService],
+  providers: [JwtStrategy],
 })
-export class AppModule {}
+export class AppModule implements NestModule {
+  configure(consumer: MiddlewareConsumer) {
+    consumer.apply(RoleMiddleware).forRoutes("products");
+  }
+}
