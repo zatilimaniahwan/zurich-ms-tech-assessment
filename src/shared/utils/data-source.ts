@@ -2,6 +2,12 @@ import { TypeOrmModuleOptions } from "@nestjs/typeorm";
 import { Product } from "../../products/entities/product.entity";
 import { ConfigService } from "@nestjs/config";
 
+/**
+ * Generates the TypeORM module options based on the environment variables.
+ *
+ * @param {ConfigService} configService - The ConfigService instance.
+ * @returns {TypeOrmModuleOptions} - The TypeORM module options.
+ */
 export const dataSource = (
   configService: ConfigService
 ): TypeOrmModuleOptions => ({
