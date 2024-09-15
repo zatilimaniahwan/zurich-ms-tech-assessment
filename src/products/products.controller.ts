@@ -26,7 +26,7 @@ export class ProductsController {
   @Post("create")
   @ApiBearerAuth() // Add Bearer Auth to the Swagger docs
   @ApiOperation({ summary: "Creates a product" })
-  @ApiResponse({ status: 200, description: "Product successfully removed" })
+  @ApiResponse({ status: 201, description: "Product successfully removed" })
   @ApiResponse({ status: 401, description: "Unauthorized access" })
   /**
    * Creates a new product.
@@ -65,7 +65,7 @@ export class ProductsController {
   @Put("update")
   @ApiBearerAuth() // Add Bearer Auth to the Swagger docs
   @ApiOperation({ summary: "Updates a product" })
-  @ApiResponse({ status: 200, description: "Product successfully updated" })
+  @ApiResponse({ status: 201, description: "Product successfully updated" })
   @ApiResponse({ status: 401, description: "Unauthorized access" })
   @ApiResponse({ status: 404, description: "Product not found" })
   /**
@@ -91,7 +91,7 @@ export class ProductsController {
   @Delete("remove")
   @ApiBearerAuth() // Add Bearer Auth to the Swagger docs
   @ApiOperation({ summary: "Removes a product" })
-  @ApiResponse({ status: 200, description: "Product successfully removed" })
+  @ApiResponse({ status: 201, description: "Product successfully removed" })
   @ApiResponse({ status: 401, description: "Unauthorized access" })
   @ApiResponse({ status: 404, description: "Product not found" })
   /**
