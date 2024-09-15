@@ -42,7 +42,7 @@ export class ProductsController {
   }
 
   @Get("get")
-  @ApiOperation({ summary: "Updates a product" })
+  @ApiOperation({ summary: " Fetchs a product" })
   @ApiResponse({ status: 200, description: "Product found" })
   @ApiResponse({ status: 401, description: "Unauthorized access" })
   @ApiResponse({ status: 404, description: "Product not found" })
