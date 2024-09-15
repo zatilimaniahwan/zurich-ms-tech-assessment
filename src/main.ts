@@ -6,6 +6,7 @@ async function bootstrap() {
   const app = await NestFactory.create(AppModule);
 
   const config = new DocumentBuilder()
+    .addBearerAuth()
     .setTitle("Motor Insurance API")
     .setDescription("API for motor insurance pricing")
     .setVersion("1.0")
