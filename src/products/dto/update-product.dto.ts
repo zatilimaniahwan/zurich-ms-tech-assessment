@@ -1,4 +1,4 @@
 export class UpdateProductDto {
-  location?: ProductLocation;
+  location: ProductLocation;
   price?: number;
 }
