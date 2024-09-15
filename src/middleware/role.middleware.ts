@@ -10,7 +10,20 @@ import { NextFunction } from "express";
 export class RoleMiddleware implements NestMiddleware {
   constructor(private readonly jwtService: JwtService) {}
 
-  use(req: Request, res: Response, next: NextFunction) {
+  /**
+   * Middleware to check if the request has a valid JWT token.
+   * If the token is valid, it extracts the user role from the token and
+   * attaches it to the request.
+   * If the route is an admin-protected route, it checks if the user has
+   * the admin role.
+   * If the token is invalid or no token is provided, it throws an
+   * UnauthorizedException.
+   *
+   * @param req - The express request object.
+   * @param _ - The express response object.
+   * @param next - The express next function.
+   */
+  use(req: Request, _: Response, next: NextFunction) {
     const authHeader = req.headers["authorization"];
 
     if (!authHeader) throw new UnauthorizedException("No token found");
@@ -32,7 +45,7 @@ export class RoleMiddleware implements NestMiddleware {
 
       // if it's an admin-protected route, check if user has admin role
       if (req.method !== "GET" && userRole !== "admin") {
-        throw new UnauthorizedException("Only admins can access this route");
+        throw new UnauthorizedException("Only admin can access this route");
       }
 
       next();
