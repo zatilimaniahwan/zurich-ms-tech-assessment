@@ -33,7 +33,7 @@ describe("ProductsController", () => {
       "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImFkbWluIiwicm9sZSI6ImFkbWluIiwic3ViIjoiMTIzNDUiLCJpYXQiOjE3MjY0MjA3NzV9.HVdUYC_ETfFlAJ_zDMczRmj28dmDOmsTKLDKUvqezlA"; // Replace with your valid token
     const createProductDto: CreateProductDto = {
       productCode: 9000,
-      location: "West",
+      location: "West Malaysia",
       price: 1,
     };
 

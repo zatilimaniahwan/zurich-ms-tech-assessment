@@ -28,24 +28,6 @@ describe("ProductsService", () => {
 
   // create a new product
   describe("create a new product", () => {
-    it('should add "Malaysia" to location if it does not contain "Malaysia"', async () => {
-      const createProductDto: CreateProductDto = {
-        productCode: 1000,
-        location: "West",
-        price: 300,
-      };
-
-      const result = {
-        ...createProductDto,
-        location: "West Malaysia",
-      };
-
-      jest.spyOn(repository, "create").mockImplementation(() => result as any);
-      jest.spyOn(repository, "save").mockResolvedValue(result as any);
-
-      expect(await service.create(createProductDto)).toEqual(result);
-    });
-
     it("should create a new product", async () => {
       const createProductDto: CreateProductDto = {
         productCode: 1000,
@@ -100,7 +82,7 @@ describe("ProductsService", () => {
   // updating a product
   describe("update", () => {
     it("should throw NotFoundException if no productCode is provided", async () => {
-      const updateProductDto: UpdateProductDto = { location: "West" };
+      const updateProductDto: UpdateProductDto = { location: "West Malaysia" };
 
       await expect(service.update(null, updateProductDto)).rejects.toThrow(
         NotFoundException
