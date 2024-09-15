@@ -1,5 +1,5 @@
 import { TypeOrmModuleOptions } from "@nestjs/typeorm";
-import { Product } from "src/products/entities/product.entity";
+import { Product } from "../../products/entities/product.entity";
 import { ConfigService } from "@nestjs/config";
 
 export const dataSource = (
