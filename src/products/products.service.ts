@@ -24,15 +24,6 @@ export class ProductsService {
    * @returns The created product.
    */
   async create(createProductDto: CreateProductDto): Promise<Product> {
-    // Ensure location is defined and contains 'Malaysia'
-    if (
-      createProductDto.location &&
-      !createProductDto.location.toLowerCase().includes("malaysia")
-    ) {
-      // Append 'Malaysia' if not already present
-      createProductDto.location = `${createProductDto.location} Malaysia`;
-    }
-
     const product = this.productRepository.create(createProductDto);
     return await this.productRepository.save(product);
   }
@@ -46,14 +37,12 @@ export class ProductsService {
    * @throws {NotFoundException} If no product code or location is provided,
    *                              or if the product is not found.
    */
-  async findOne(productCode: number, location: string): Promise<Product> {
+  async findOne(
+    productCode: number,
+    location: ProductLocation
+  ): Promise<Product> {
     if (!productCode && !location) {
       throw new NotFoundException("No product code and location provided");
-    }
-    // Ensure location is passed and contains 'Malaysia'
-    if (location && !location.toLowerCase().includes("malaysia")) {
-      // Append 'Malaysia' if not already present
-      location = `${location} Malaysia`;
     }
 
     const product = await this.productRepository.findOne({
@@ -79,15 +68,6 @@ export class ProductsService {
     updateProductDto: UpdateProductDto
   ): Promise<Product> {
     if (!productCode) throw new NotFoundException("No product code provided");
-
-    // Ensure location is defined and contains 'Malaysia'
-    if (
-      updateProductDto.location &&
-      !updateProductDto.location.toLowerCase().includes("malaysia")
-    ) {
-      // Append 'Malaysia' if not already present
-      updateProductDto.location = `${updateProductDto.location} Malaysia`;
-    }
 
     // need to check the location of the product since the productCode is not unique
     const product = await this.productRepository.findOne({

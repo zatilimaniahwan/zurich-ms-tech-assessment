@@ -57,7 +57,7 @@ export class ProductsController {
   findOne(
     @Query("productCode")
     productCode: number,
-    @Query("location") location: string
+    @Query("location") location: ProductLocation
   ) {
     return this.productsService.findOne(productCode, location);
   }
