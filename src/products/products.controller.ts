@@ -24,15 +24,17 @@ export class ProductsController {
   constructor(private readonly productsService: ProductsService) {}
 
   @Post("create")
-  @ApiBearerAuth() // Add Bearer Auth to the Swagger docs
+  @ApiBearerAuth()
   @ApiOperation({ summary: "Creates a product" })
   @ApiResponse({ status: 201, description: "Product successfully removed" })
   @ApiResponse({ status: 401, description: "Unauthorized access" })
   /**
-   * Creates a new product.
+   * Creates a product
    *
-   * @param createProductDto - The create product DTO.
-   * @returns The created product.
+   * @param createProductDto - The create product DTO
+   * @param req - The express request object
+   * @returns The created product
+   * @throws {UnauthorizedException} If the user is not an admin
    */
   create(@Body() createProductDto: CreateProductDto, @Req() req: any) {
     if (req.userRole !== "admin") {
@@ -63,7 +65,7 @@ export class ProductsController {
   }
 
   @Put("update")
-  @ApiBearerAuth() // Add Bearer Auth to the Swagger docs
+  @ApiBearerAuth()
   @ApiOperation({ summary: "Updates a product" })
   @ApiResponse({ status: 201, description: "Product successfully updated" })
   @ApiResponse({ status: 401, description: "Unauthorized access" })
@@ -74,6 +76,7 @@ export class ProductsController {
    * @param productCode - The product code.
    * @param updateProductDto - The update product DTO.
    * @returns The updated product.
+   * @throws {UnauthorizedException} If the user is not an admin.
    * @throws {NotFoundException} If no product code is provided,
    *                              or if the product is not found.
    */
@@ -89,11 +92,12 @@ export class ProductsController {
   }
 
   @Delete("remove")
-  @ApiBearerAuth() // Add Bearer Auth to the Swagger docs
+  @ApiBearerAuth()
   @ApiOperation({ summary: "Removes a product" })
   @ApiResponse({ status: 201, description: "Product successfully removed" })
   @ApiResponse({ status: 401, description: "Unauthorized access" })
   @ApiResponse({ status: 404, description: "Product not found" })
+
   /**
    * Removes a product.
    *
@@ -101,6 +105,7 @@ export class ProductsController {
    * @returns A promise that resolves if the product was successfully removed.
    * @throws {NotFoundException} If no product code is provided,
    *                              or if the product is not found.
+   * @throws {UnauthorizedException} If the user is not an admin.
    */
   remove(@Query("productCode") productCode: number, @Req() req: any) {
     if (req.userRole !== "admin") {
