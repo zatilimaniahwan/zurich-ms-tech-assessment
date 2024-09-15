@@ -23,11 +23,18 @@ export class ProductsService {
    * @param createProductDto - The create product DTO.
    * @returns The created product.
    */
-  create(createProductDto: CreateProductDto): Promise<Product> {
-    const product = this.productRepository.create(createProductDto);
-    console.log(product);
+  async create(createProductDto: CreateProductDto): Promise<Product> {
+    // Ensure location is defined and contains 'Malaysia'
+    if (
+      createProductDto.location &&
+      !createProductDto.location.toLowerCase().includes("malaysia")
+    ) {
+      // Append 'Malaysia' if not already present
+      createProductDto.location = `${createProductDto.location} Malaysia`;
+    }
 
-    return this.productRepository.save(product);
+    const product = this.productRepository.create(createProductDto);
+    return await this.productRepository.save(product);
   }
 
   /**
@@ -39,18 +46,19 @@ export class ProductsService {
    * @throws {NotFoundException} If no product code or location is provided,
    *                              or if the product is not found.
    */
-  async findOne(productCode?: string, location?: string): Promise<Product> {
-    const request = {};
-
-    if (productCode) request["productCode"] = productCode;
-
-    if (location) request["location"] = location;
-
-    if (Object.keys(request).length === 0) {
-      throw new NotFoundException("No product code or location provided");
+  async findOne(productCode: number, location: string): Promise<Product> {
+    if (!productCode && !location) {
+      throw new NotFoundException("No product code and location provided");
+    }
+    // Ensure location is passed and contains 'Malaysia'
+    if (location && !location.toLowerCase().includes("malaysia")) {
+      // Append 'Malaysia' if not already present
+      location = `${location} Malaysia`;
     }
 
-    const product = await this.productRepository.findOne({ where: request });
+    const product = await this.productRepository.findOne({
+      where: { productCode, location },
+    });
 
     if (!product) throw new NotFoundException("Product not found");
 
@@ -67,13 +75,23 @@ export class ProductsService {
    *                              or if the product is not found.
    */
   async update(
-    productCode: string,
+    productCode: number,
     updateProductDto: UpdateProductDto
   ): Promise<Product> {
     if (!productCode) throw new NotFoundException("No product code provided");
 
+    // Ensure location is defined and contains 'Malaysia'
+    if (
+      updateProductDto.location &&
+      !updateProductDto.location.toLowerCase().includes("malaysia")
+    ) {
+      // Append 'Malaysia' if not already present
+      updateProductDto.location = `${updateProductDto.location} Malaysia`;
+    }
+
+    // need to check the location of the product since the productCode is not unique
     const product = await this.productRepository.findOne({
-      where: { productCode },
+      where: { productCode, location: updateProductDto.location },
     });
 
     if (!product) throw new NotFoundException("Product not found");
@@ -91,7 +109,7 @@ export class ProductsService {
    * @throws {NotFoundException} If no product code is provided,
    *                              or if the product is not found.
    */
-  async remove(productCode: string): Promise<void> {
+  async remove(productCode: number): Promise<void> {
     if (!productCode) throw new NotFoundException("No product code provided");
     const deletedProduct = await this.productRepository.delete({
       productCode,
