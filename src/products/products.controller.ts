@@ -23,13 +23,16 @@ export class ProductsController {
   @ApiOperation({ summary: "Creates a product" })
   @ApiResponse({ status: 201, description: "Product successfully removed" })
   @ApiResponse({ status: 401, description: "Unauthorized access" })
+  @ApiResponse({ status: 409, description: "Duplicate product" })
+
   /**
-   * Creates a product
+   * Creates a product.
    *
-   * @param createProductDto - The create product DTO
-   * @param req - The express request object
-   * @returns The created product
-   * @throws {UnauthorizedException} If the user is not an admin
+   * @param createProductDto - The create product DTO.
+   * @param req - The express request object.
+   * @returns The created product.
+   * @throws {UnauthorizedException} If the user is not an admin.
+   * @throws {ConflictException} If a product with the same location and product code already exists.
    */
   create(@Body() createProductDto: CreateProductDto, @Req() req: any) {
     if (req.userRole !== "admin") {
