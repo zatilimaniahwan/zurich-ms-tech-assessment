@@ -1,7 +1,8 @@
 import { UUID } from "crypto";
-import { Entity, Column, PrimaryGeneratedColumn } from "typeorm";
+import { Entity, Column, PrimaryGeneratedColumn, Unique } from "typeorm";
 
 @Entity("PRODUCT")
+@Unique(["productCode", "location"])
 export class Product {
   @PrimaryGeneratedColumn("uuid")
   id: UUID;
