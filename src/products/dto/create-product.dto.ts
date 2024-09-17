@@ -1,6 +1,6 @@
 export class CreateProductDto {
   productCode: number;
-  location: ProductLocation;
+  location: ProductLocation | string;
   price: number;
   productDesc?: string;
 }
