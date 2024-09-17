@@ -9,7 +9,6 @@ import { Product } from "./entities/product.entity";
 
 describe("ProductsController", () => {
   let app: INestApplication;
-  let jwtService: JwtService;
 
   beforeAll(async () => {
     const moduleFixture: TestingModule = await Test.createTestingModule({
@@ -19,7 +18,7 @@ describe("ProductsController", () => {
     app = moduleFixture.createNestApplication();
     await app.init();
 
-    jwtService = moduleFixture.get<JwtService>(JwtService);
+    moduleFixture.get<JwtService>(JwtService);
   });
 
   afterAll(async () => {

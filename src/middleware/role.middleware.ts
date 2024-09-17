@@ -50,7 +50,7 @@ export class RoleMiddleware implements NestMiddleware {
 
       next();
     } catch (e) {
-      throw new UnauthorizedException("Invalid or expired token");
+      throw new UnauthorizedException("Invalid or expired token", e);
     }
   }
 }
