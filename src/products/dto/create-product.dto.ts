@@ -1,5 +1,5 @@
 export class CreateProductDto {
   productCode: number;
-  location: ProductLocation | string;
+  location: ProductLocation;
   price: number;
 }

@@ -56,7 +56,7 @@ describe("ProductsService", () => {
     it("should throw BadRequestException for invalid location", async () => {
       const createProductDto: CreateProductDto = {
         productCode: 1000,
-        location: "West",
+        location: "West" as ProductLocation,
         price: 300,
       };
 
