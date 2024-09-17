@@ -4,7 +4,11 @@ import { Product } from "./entities/product.entity";
 import { getRepositoryToken } from "@nestjs/typeorm";
 import { Repository } from "typeorm";
 import { CreateProductDto } from "./dto/create-product.dto";
-import { NotFoundException } from "@nestjs/common/exceptions";
+import {
+  BadRequestException,
+  ConflictException,
+  NotFoundException,
+} from "@nestjs/common/exceptions";
 import { UpdateProductDto } from "./dto/update-product.dto";
 
 describe("ProductsService", () => {
@@ -35,12 +39,51 @@ describe("ProductsService", () => {
         price: 300,
       };
 
-      const result = createProductDto;
+      const result: Product = {
+        ...createProductDto,
+        id: "xx-xx-xx-xx-xx",
+        productCode: 1000,
+        productDesc: null,
+      };
 
-      jest.spyOn(repository, "create").mockImplementation(() => result as any);
-      jest.spyOn(repository, "save").mockResolvedValue(result as any);
+      jest.spyOn(repository, "findOne").mockResolvedValue(null);
+      jest.spyOn(repository, "create").mockReturnValue(result);
+      jest.spyOn(repository, "save").mockResolvedValue(result);
 
       expect(await service.create(createProductDto)).toEqual(result);
+    });
+
+    it("should throw BadRequestException for invalid location", async () => {
+      const createProductDto: CreateProductDto = {
+        productCode: 1000,
+        location: "West",
+        price: 300,
+      };
+
+      await expect(service.create(createProductDto)).rejects.toThrow(
+        BadRequestException
+      );
+    });
+
+    it("should throw ConflictException if product with the same location and product code already exists", async () => {
+      const createProductDto: CreateProductDto = {
+        productCode: 1000,
+        location: "West Malaysia",
+        price: 300,
+      };
+
+      const existingProduct: Product = {
+        ...createProductDto,
+        productCode: 1000,
+        id: "xx-xx-xx-xx-xx",
+        productDesc: null,
+      };
+
+      jest.spyOn(repository, "findOne").mockResolvedValue(existingProduct);
+
+      await expect(service.create(createProductDto)).rejects.toThrow(
+        ConflictException
+      );
     });
   });
 
@@ -82,7 +125,10 @@ describe("ProductsService", () => {
   // updating a product
   describe("update", () => {
     it("should throw NotFoundException if no productCode is provided", async () => {
-      const updateProductDto: UpdateProductDto = { location: "West Malaysia" };
+      const updateProductDto: UpdateProductDto = {
+        location: "West Malaysia",
+        price: 350,
+      };
 
       await expect(service.update(null, updateProductDto)).rejects.toThrow(
         NotFoundException
