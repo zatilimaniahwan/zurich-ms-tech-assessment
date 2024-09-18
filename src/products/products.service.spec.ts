@@ -111,7 +111,7 @@ describe("ProductsService", () => {
     });
 
     it("should throw NotFoundException if the product is not found", async () => {
-      const productCode = 1000;
+      const productCode = 2000;
       const location = "West Malaysia";
 
       jest.spyOn(repository, "findOne").mockResolvedValue(null);
