@@ -34,9 +34,9 @@ The schemas for the models as follows:-
 - Endpoint: `POST /products/create`
 - Description: Creates a new product.
 - Authorization: Requires admin access.
+- Request Body:
 
   ```json
-  Request Body:
   {
     "productCode": 1000,
     "location": "West Malaysia",
