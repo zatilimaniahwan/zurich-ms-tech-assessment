@@ -406,3 +406,12 @@ The tests for the ProductsService include:
 ### Test Cases
 
 <b>1. Creating a new product</b>
+
+- Test: Create a New Product
+
+  - Description: Ensures that a product is created successfully with valid input.
+  - Expected Outcome: Product is created and returned with an ID.
+
+- Test: Invalid Location
+  - Description: Throws a BadRequestException if the location is invalid.
+  - Expected Outcome: Throws a `BadRequestException` .
