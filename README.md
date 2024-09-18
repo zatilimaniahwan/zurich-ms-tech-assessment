@@ -588,7 +588,7 @@ The tests for the ProductsService include:
 
 ### Steps to generate JWT token
 
-1. Before running the command, need to change the role and username in this code
+1. Before executing the command, ensure to update the role and username values in the code to match your requirements. To generate a token for a role that is not "admin", simply replace "admin" with your desired role.
 
    ```javascript
    // replace the role and username before generating the token
