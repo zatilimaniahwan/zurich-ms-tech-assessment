@@ -30,6 +30,9 @@ import { JwtStrategy } from "./jwt/jwt.strategy";
 })
 export class AppModule implements NestModule {
   configure(consumer: MiddlewareConsumer) {
-    consumer.apply(RoleMiddleware).forRoutes("products");
+    consumer
+      .apply(RoleMiddleware)
+      .exclude("/products/get")
+      .forRoutes("/products/create", "/products/update", "/products/remove");
   }
 }
