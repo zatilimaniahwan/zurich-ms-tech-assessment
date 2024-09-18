@@ -356,13 +356,13 @@ The tests for the `ProductsController` validate:
      - Accept: `*/*`
    - Request Body
 
-     ```json
-     {
-       "productCode": 9000,
-       "location": "West Malaysia",
-       "price": 1
-     }
-     ```
+   ```json
+   {
+     "productCode": 9000,
+     "location": "West Malaysia",
+     "price": 1
+   }
+   ```
 
    - Expected Response:
      - Status Code: 201
