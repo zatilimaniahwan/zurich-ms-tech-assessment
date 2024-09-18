@@ -318,6 +318,22 @@ openssl rand -base64 32
 
   - Thrown if no token is provided, if the token is invalid, if no role is found in the token, or if the user does not have the required role.
 
+### Features Tested
+
+1. Valid Admin Token: Grants access when a valid JWT with the admin role is provided.
+
+2. No Token Provided: Throws an `UnauthorizedException` when no token is present in the request headers.
+
+3. Invalid Token Format: Throws an `UnauthorizedException` when the JWT format is invalid.
+
+4. Expired or Invalid Token: Throws an `UnauthorizedException` when the JWT is expired or otherwise invalid.
+
+5. Missing Role in Token: Throws an `UnauthorizedException` if the JWT is missing the role field.
+
+6. Non-Admin Access to Admin Route: Denies access when a non-admin user tries to access admin-protected routes.
+
+7. Allow GET Requests for Non-Admin Users: Allows non-admin users to make GET requests, as these are considered public routes.
+
 ## Unit Test
 
 ### ProductController Tests
@@ -410,8 +426,208 @@ The tests for the ProductsService include:
 - Test: Create a New Product
 
   - Description: Ensures that a product is created successfully with valid input.
+  - Input:
+
+    ```json
+    {
+      "productCode": 1000,
+      "location": "West Malaysia",
+      "price": 300
+    }
+    ```
+
   - Expected Outcome: Product is created and returned with an ID.
 
 - Test: Invalid Location
-  - Description: Throws a BadRequestException if the location is invalid.
+
+  - Description: Throws a `BadRequestException` if the location is invalid.
+  - Input:
+
+    ```json
+    {
+      "productCode": 1000,
+      "location": "West",
+      "price": 300
+    }
+    ```
+
   - Expected Outcome: Throws a `BadRequestException` .
+
+- Test: Duplicate Product
+
+  - Description: Throws a `ConflictException` if a product with the same location and product code already exists.
+  - Input:
+
+    ```json
+    {
+      "productCode": 1000,
+      "location": "West Malaysia",
+      "price": 300
+    }
+    ```
+
+  - Expected Outcome: Throws a `ConflictException`.
+
+<b>2. Fetching a Product</b>
+
+- Test: Missing Parameters
+
+  - Description: Throws a `NotFoundException` if neither productCode nor location is provided.
+  - Input:
+
+    ```json
+    {
+      "productCode": null,
+      "location": null
+    }
+    ```
+
+  - Expected Outcome: Throws a `NotFoundException`.
+
+- Test: Successfully Fetch Product
+
+  - Description: Fetches a product successfully when valid parameters are provided.
+  - Input:
+
+    ```json
+    {
+      "productCode": 1000,
+      "location": "West Malaysia"
+    }
+    ```
+
+  - Expected Outcome: Returns the product details.
+
+- Test: Product Not Found
+
+  - Description: Throws a `NotFoundException` if the product is not found.
+  - Input:
+    ```json
+    {
+      "productCode": 2000,
+      "location": "West Malaysia"
+    }
+    ```
+  - Expected Outcome: Throws a `NotFoundException`.
+
+<b>3. Updating a Product </b>
+
+- Test: Missing Product Code
+
+  - Description: Throws a `NotFoundException` if no productCode is provided.
+  - Input:
+    ```json
+    {
+      "location": "West Malaysia",
+      "price": 350
+    }
+    ```
+  - Expected Outcome: Throws a `NotFoundException`.
+
+- Test: Successfully Update Product
+
+  - Description: Updates the product successfully when valid data is provided.
+  - Input:
+    ```json
+    {
+      "productCode": 1000,
+      "location": "West Malaysia",
+      "price": 350
+    }
+    ```
+  - Expected Outcome: Returns the updated product details.
+
+<b>4. Removing a Product </b>
+
+- Test: Missing Product Code
+
+  - Description: Throws a `NotFoundException` if no productCode is provided.
+  - Input:
+
+    ```json
+    {
+      "productCode": null
+    }
+    ```
+
+  - Expected Outcome: Throws a `NotFoundException` .
+
+- Test: Product Not Found
+
+  - Description: Throws a `NotFoundException` if no product is found with the provided productCode.
+  - Input:
+
+    ```json
+    {
+      "productCode": 1000
+    }
+    ```
+
+  - Expected Outcome: Throws a `NotFoundException` .
+
+- Test: Successfully Remove Product
+
+  - Description: Successfully removes a product if it exists.
+  - Input:
+    ```json
+    {
+      "productCode": 1000
+    }
+    ```
+  - Expected Outcome: Removes the product and resolves without errors.
+
+## Steps to Test Endpoint in Swagger UI
+
+1. Create .env file to configure Postgres and JWT. The information as follows:
+
+   ```.env
+   DB_TYPE=
+   DB_HOST=
+   DB_PORT=
+   DB_USERNAME=
+   DB_PASSWORD=
+   DB_NAME=
+   DB_SYNCHRONIZE=true
+
+   API_PORT=3000
+   DB_PORT=5432
+
+   JWT_SECRET=
+   ```
+
+   Run this command in the terminal to generate JWT_SECRET
+
+   ```bash
+    openssl rand -base64 32
+   ```
+
+2. Run this command
+
+   ```zsh
+   npm run start
+   ```
+
+3. Then, redirect to `localhost:3000`
+
+4. Insert the generated token into the Authorization section in Swagger to authenticate and test the protected endpoint.
+
+### Steps to generate JWT token
+
+1. Before running the command, need to change the role and username in this code
+
+   ```javascript
+   // replace the role and username before generating the token
+   var token = jwtService.sign({
+     username: "admin",
+     role: "admin",
+     sub: "12345",
+   });
+   ```
+
+2. Run this command
+
+   ```node.js
+     node src/jwt/generate-token.js
+   ```
+
+For the sample `JWT_SECRET` key can refer to the document attached in the email.
