@@ -31,26 +31,23 @@ export class RoleMiddleware implements NestMiddleware {
     const token = authHeader.split(" ")[1];
     if (!token) throw new UnauthorizedException("Invalid token format");
 
-    try {
-      // Decrypt and verify JWT token
-      const decode = this.jwtService.verify(token, {
-        secret: process.env.JWT_SECRET,
-      });
+    // Decrypt and verify JWT token
+    const decode = this.jwtService.verify(token, {
+      secret: process.env.JWT_SECRET,
+    });
 
-      // check if user role exists in token
-      const userRole = decode.role;
-      if (!userRole) throw new UnauthorizedException("No role found in token");
-      // Attach user role to request
-      req["userRole"] = userRole;
+    // check if user role exists in token
+    const userRole = decode.role;
 
-      // if it's an admin-protected route, check if user has admin role
-      if (req.method !== "GET" && userRole !== "admin") {
-        throw new UnauthorizedException("Only admin can access this route");
-      }
+    if (!userRole) throw new UnauthorizedException("No role found in token");
+    // Attach user role to request
+    req["userRole"] = userRole;
 
-      next();
-    } catch (e) {
-      throw new UnauthorizedException("Invalid or expired token", e);
+    // if it's an admin-protected route, check if user has admin role
+    if (req.method !== "GET" && userRole !== "admin") {
+      throw new UnauthorizedException("Only admin can access this route");
     }
+
+    next();
   }
 }

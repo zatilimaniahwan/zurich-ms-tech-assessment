@@ -74,7 +74,7 @@ describe("RoleMiddleware", () => {
 
     expect(() =>
       roleMiddleware.use(mockRequest as any, mockResponse as any, mockNext)
-    ).toThrow(new UnauthorizedException("Invalid or expired token"));
+    ).toThrow(new UnauthorizedException("Token expired or invalid"));
 
     expect(mockNext).not.toHaveBeenCalled();
   });
@@ -91,7 +91,7 @@ describe("RoleMiddleware", () => {
 
     expect(() =>
       roleMiddleware.use(mockRequest as any, mockResponse as any, mockNext)
-    ).toThrow(new UnauthorizedException("Invalid or expired token"));
+    ).toThrow(new UnauthorizedException("No role found in token"));
 
     expect(mockNext).not.toHaveBeenCalled();
   });
@@ -109,7 +109,7 @@ describe("RoleMiddleware", () => {
 
     expect(() =>
       roleMiddleware.use(mockRequest as any, mockResponse as any, mockNext)
-    ).toThrow(new UnauthorizedException("Invalid or expired token"));
+    ).toThrow(new UnauthorizedException("Only admin can access this route"));
 
     expect(mockNext).not.toHaveBeenCalled();
   });
