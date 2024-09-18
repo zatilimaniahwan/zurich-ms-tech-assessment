@@ -71,6 +71,6 @@ describe("ProductsController", () => {
       .send(createProductDto)
       .expect(401);
 
-    expect(response.body.message).toBe("Invalid or expired token");
+    expect(response.body.message).toBe("Only admin can access this route");
   });
 });
