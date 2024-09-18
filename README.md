@@ -553,7 +553,7 @@ The tests for the ProductsService include:
 
 ## Steps to Test Endpoint in Swagger UI
 
-1. Create .env file to configure Postgres and JWT. The information as follows:
+1. Create .env file to configure Postgres and JWT at the root level. The information as follows:
 
    ```.env
    DB_TYPE=
