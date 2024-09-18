@@ -7,7 +7,6 @@ import {
   Query,
   Delete,
   Req,
-  UnauthorizedException,
 } from "@nestjs/common";
 import { ProductsService } from "./products.service";
 import { CreateProductDto } from "./dto/create-product.dto";
@@ -34,10 +33,7 @@ export class ProductsController {
    * @throws {UnauthorizedException} If the user is not an admin.
    * @throws {ConflictException} If a product with the same location and product code already exists.
    */
-  create(@Body() createProductDto: CreateProductDto, @Req() req: any) {
-    if (req.userRole !== "admin") {
-      throw new UnauthorizedException("Only admins can access this route");
-    }
+  create(@Body() createProductDto: CreateProductDto) {
     return this.productsService.create(createProductDto);
   }
 
@@ -80,12 +76,8 @@ export class ProductsController {
    */
   update(
     @Query("productCode") productCode: number,
-    @Body() updateProductDto: UpdateProductDto,
-    @Req() req: any
+    @Body() updateProductDto: UpdateProductDto
   ) {
-    if (req.userRole !== "admin") {
-      throw new UnauthorizedException("Only admins can access this route");
-    }
     return this.productsService.update(productCode, updateProductDto);
   }
 
@@ -105,10 +97,7 @@ export class ProductsController {
    *                              or if the product is not found.
    * @throws {UnauthorizedException} If the user is not an admin.
    */
-  remove(@Query("productCode") productCode: number, @Req() req: any) {
-    if (req.userRole !== "admin") {
-      throw new UnauthorizedException("Only admins can access this route");
-    }
+  remove(@Query("productCode") productCode: number) {
     return this.productsService.remove(productCode);
   }
 }

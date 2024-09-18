@@ -22,6 +22,17 @@ export class ProductsService {
     private readonly productRepository: Repository<Product>
   ) {}
 
+  validateLocation = (location: string) => {
+    // Validate the location value
+    const allowedLocations: ProductLocation[] = [
+      "West Malaysia",
+      "East Malaysia",
+    ];
+    if (!allowedLocations.includes(location as ProductLocation)) {
+      throw new BadRequestException("Invalid location value provided");
+    }
+  };
+
   /**
    * Creates a product.
    *
@@ -31,16 +42,7 @@ export class ProductsService {
    * @throws {ConflictException} If a product with the same location and product code already exists.
    */
   async create(createProductDto: CreateProductDto): Promise<Product> {
-    // Validate the location value
-    const allowedLocations: ProductLocation[] = [
-      "West Malaysia",
-      "East Malaysia",
-    ];
-    if (
-      !allowedLocations.includes(createProductDto.location as ProductLocation)
-    ) {
-      throw new BadRequestException("Invalid location value provided");
-    }
+    this.validateLocation(createProductDto.location);
 
     // Check for existing product with the same location and product code
     const existingProduct = await this.productRepository.findOne({
@@ -78,6 +80,8 @@ export class ProductsService {
       throw new NotFoundException("No product code and location provided");
     }
 
+    this.validateLocation(location);
+
     const product = await this.productRepository.findOne({
       where: { productCode, location },
     });
@@ -101,6 +105,8 @@ export class ProductsService {
     updateProductDto: UpdateProductDto
   ): Promise<Product> {
     if (!productCode) throw new NotFoundException("No product code provided");
+
+    this.validateLocation(updateProductDto.location);
 
     // need to check the location of the product since the productCode is not unique
     const product = await this.productRepository.findOne({
