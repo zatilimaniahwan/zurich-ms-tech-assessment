@@ -52,8 +52,6 @@ describe("ProductsService", () => {
       jest.spyOn(repository, "create").mockReturnValue(product);
       jest.spyOn(repository, "save").mockResolvedValue(product);
 
-      console.log(await service.create(createProductDto));
-
       expect(await service.create(createProductDto)).toEqual(result as Product);
     });
 
