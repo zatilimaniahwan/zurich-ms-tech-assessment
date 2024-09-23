@@ -471,7 +471,7 @@ The tests for the ProductsService include:
 
 - Test: Missing Parameters
 
-  - Description: Throws a `NotFoundException` if neither productCode nor location is provided.
+  - Description: Throws a `BadRequestException` if neither productCode nor location is provided.
   - Input:
 
     ```json
@@ -481,7 +481,7 @@ The tests for the ProductsService include:
     }
     ```
 
-  - Expected Outcome: Throws a `NotFoundException`.
+  - Expected Outcome: Throws a `BadRequestException`.
 
 - Test: Successfully Fetch Product
 
@@ -513,7 +513,7 @@ The tests for the ProductsService include:
 
 - Test: Missing Product Code
 
-  - Description: Throws a `NotFoundException` if no productCode is provided.
+  - Description: Throws a `BadRequestException` if no productCode is provided.
   - Input:
     ```json
     {
@@ -521,7 +521,7 @@ The tests for the ProductsService include:
       "price": 350
     }
     ```
-  - Expected Outcome: Throws a `NotFoundException`.
+  - Expected Outcome: Throws a `BadRequestException`.
 
 - Test: Successfully Update Product
 
@@ -540,7 +540,7 @@ The tests for the ProductsService include:
 
 - Test: Missing Product Code
 
-  - Description: Throws a `NotFoundException` if no productCode is provided.
+  - Description: Throws a `BadRequestException` if no productCode is provided.
   - Input:
 
     ```json
@@ -549,7 +549,7 @@ The tests for the ProductsService include:
     }
     ```
 
-  - Expected Outcome: Throws a `NotFoundException` .
+  - Expected Outcome: Throws a `BadRequestException` .
 
 - Test: Product Not Found
 

@@ -39,18 +39,22 @@ describe("ProductsService", () => {
         price: 300,
       };
 
-      const result: Product = {
+      const product = new Product();
+      product.productCode = createProductDto.productCode;
+      product.location = createProductDto.location;
+      product.setPrice(createProductDto.price);
+
+      const result = {
         ...createProductDto,
-        id: "xx-xx-xx-xx-xx",
-        productCode: 1000,
-        productDesc: null,
       };
 
       jest.spyOn(repository, "findOne").mockResolvedValue(null);
-      jest.spyOn(repository, "create").mockReturnValue(result);
-      jest.spyOn(repository, "save").mockResolvedValue(result);
+      jest.spyOn(repository, "create").mockReturnValue(product);
+      jest.spyOn(repository, "save").mockResolvedValue(product);
 
-      expect(await service.create(createProductDto)).toEqual(result);
+      console.log(await service.create(createProductDto));
+
+      expect(await service.create(createProductDto)).toEqual(result as Product);
     });
 
     it("should throw BadRequestException for invalid location", async () => {
@@ -72,14 +76,16 @@ describe("ProductsService", () => {
         price: 300,
       };
 
-      const existingProduct: Product = {
+      const existingProduct = {
         ...createProductDto,
         productCode: 1000,
         id: "xx-xx-xx-xx-xx",
         productDesc: null,
       };
 
-      jest.spyOn(repository, "findOne").mockResolvedValue(existingProduct);
+      jest
+        .spyOn(repository, "findOne")
+        .mockResolvedValue(existingProduct as Product);
 
       await expect(service.create(createProductDto)).rejects.toThrow(
         ConflictException
@@ -89,9 +95,9 @@ describe("ProductsService", () => {
 
   // fetching a product
   describe("fetching a product", () => {
-    it("should throw NotFoundException if neither productCode nor location is provided", async () => {
+    it("should throw BadRequestException if neither productCode nor location is provided", async () => {
       await expect(service.findOne(null, null)).rejects.toThrow(
-        NotFoundException
+        BadRequestException
       );
     });
 
@@ -124,30 +130,34 @@ describe("ProductsService", () => {
 
   // updating a product
   describe("update", () => {
-    it("should throw NotFoundException if no productCode is provided", async () => {
+    it("should throw BadRequestException if no productCode is provided", async () => {
       const updateProductDto: UpdateProductDto = {
         location: "West Malaysia",
         price: 350,
       };
 
       await expect(service.update(null, updateProductDto)).rejects.toThrow(
-        NotFoundException
+        BadRequestException
       );
     });
-
     it("should update the product successfully", async () => {
       const productCode = 1000;
       const updateProductDto: UpdateProductDto = {
         location: "West Malaysia",
         price: 350,
       };
-      const product = {
-        productCode,
-        location: "West Malaysia",
-        price: 300,
-      } as Product;
 
-      const updatedProduct = { ...product, ...updateProductDto };
+      // Create a product instance and set its properties
+      const product = new Product();
+      product.productCode = productCode;
+      product.location = "West Malaysia";
+      product.setPrice(300); // Existing price
+
+      // Create an updated product instance
+      const updatedProduct = new Product();
+      updatedProduct.productCode = productCode;
+      updatedProduct.location = updateProductDto.location;
+      updatedProduct.setPrice(updateProductDto.price);
 
       jest.spyOn(repository, "findOne").mockResolvedValue(product);
       jest.spyOn(repository, "save").mockResolvedValue(updatedProduct);
@@ -156,7 +166,7 @@ describe("ProductsService", () => {
 
       expect(result).toEqual(updatedProduct);
       expect(repository.findOne).toHaveBeenCalledWith({
-        where: { productCode, location: "West Malaysia" },
+        where: { productCode },
       });
       expect(repository.save).toHaveBeenCalledWith(updatedProduct);
     });
@@ -164,8 +174,8 @@ describe("ProductsService", () => {
 
   // removing a product
   describe("remove a product", () => {
-    it("should throw NotFoundException if no productCode is provided", async () => {
-      await expect(service.remove(null)).rejects.toThrow(NotFoundException);
+    it("should throw BadRequestException if no productCode is provided", async () => {
+      await expect(service.remove(null)).rejects.toThrow(BadRequestException);
     });
 
     it("should throw NotFoundException if no product is found with the provided productCode", async () => {
