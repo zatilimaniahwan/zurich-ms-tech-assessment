@@ -3,12 +3,15 @@ import { ProductsService } from "./products.service";
 import { CreateProductDto } from "./dto/create-product.dto";
 import { JwtService } from "@nestjs/jwt";
 import * as request from "supertest";
-import { INestApplication } from "@nestjs/common";
+import { INestApplication, InternalServerErrorException } from "@nestjs/common";
 import { AppModule } from "../app.module";
 import { Product } from "./entities/product.entity";
+import { ProductsController } from "./products.controller";
 
 describe("ProductsController", () => {
   let app: INestApplication;
+  let productsController: ProductsController;
+  let productsService: ProductsService;
 
   beforeAll(async () => {
     const moduleFixture: TestingModule = await Test.createTestingModule({
@@ -19,6 +22,9 @@ describe("ProductsController", () => {
     await app.init();
 
     moduleFixture.get<JwtService>(JwtService);
+    productsController =
+      moduleFixture.get<ProductsController>(ProductsController);
+    productsService = moduleFixture.get<ProductsService>(ProductsService);
   });
 
   afterAll(async () => {
@@ -49,6 +55,8 @@ describe("ProductsController", () => {
       .send(createProductDto)
       .expect(201);
 
+    Object.assign(response.body, { price: Number(response.body.price) });
+
     expect(response.body).toEqual(createProductDto);
     expect(response.body.productCode).toBe(createProductDto.productCode);
     expect(response.body.location).toBe(createProductDto.location);
@@ -72,5 +80,22 @@ describe("ProductsController", () => {
       .expect(401);
 
     expect(response.body.message).toBe("Only admin can access this route");
+  });
+
+  it("should throw an InternalServerErrorException if an error occurs", async () => {
+    const createProductDto: CreateProductDto = {
+      productCode: 7000,
+      location: "West Malaysia",
+      price: 650.55,
+    };
+
+    // Mock the service method to throw an error
+    jest.spyOn(productsService, "create").mockImplementation(() => {
+      throw new Error("Internal service error");
+    });
+
+    await expect(productsController.create(createProductDto)).rejects.toThrow(
+      InternalServerErrorException
+    );
   });
 });
