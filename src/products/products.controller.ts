@@ -6,7 +6,6 @@ import {
   Put,
   Query,
   Delete,
-  Req,
 } from "@nestjs/common";
 import { ProductsService } from "./products.service";
 import { CreateProductDto } from "./dto/create-product.dto";
@@ -20,10 +19,9 @@ export class ProductsController {
   @Post("create")
   @ApiBearerAuth()
   @ApiOperation({ summary: "Creates a product" })
-  @ApiResponse({ status: 201, description: "Product successfully removed" })
+  @ApiResponse({ status: 201, description: "Product successfully created" })
   @ApiResponse({ status: 401, description: "Unauthorized access" })
   @ApiResponse({ status: 409, description: "Duplicate product" })
-
   /**
    * Creates a product.
    *
@@ -33,12 +31,12 @@ export class ProductsController {
    * @throws {UnauthorizedException} If the user is not an admin.
    * @throws {ConflictException} If a product with the same location and product code already exists.
    */
-  create(@Body() createProductDto: CreateProductDto) {
-    return this.productsService.create(createProductDto);
+  async create(@Body() createProductDto: CreateProductDto) {
+    return await this.productsService.create(createProductDto);
   }
 
   @Get("get")
-  @ApiOperation({ summary: " Fetchs a product" })
+  @ApiOperation({ summary: "Fetches a product" })
   @ApiResponse({ status: 200, description: "Product found" })
   @ApiResponse({ status: 401, description: "Unauthorized access" })
   @ApiResponse({ status: 404, description: "Product not found" })
@@ -50,12 +48,11 @@ export class ProductsController {
    * @returns The product.
    * @throws {NotFoundException} If the product is not found.
    */
-  findOne(
-    @Query("productCode")
-    productCode: number,
+  async findOne(
+    @Query("productCode") productCode: number,
     @Query("location") location: ProductLocation
   ) {
-    return this.productsService.findOne(productCode, location);
+    return await this.productsService.findOne(productCode, location);
   }
 
   @Put("update")
@@ -74,11 +71,11 @@ export class ProductsController {
    * @throws {NotFoundException} If no product code is provided,
    *                              or if the product is not found.
    */
-  update(
+  async update(
     @Query("productCode") productCode: number,
     @Body() updateProductDto: UpdateProductDto
   ) {
-    return this.productsService.update(productCode, updateProductDto);
+    return await this.productsService.update(productCode, updateProductDto);
   }
 
   @Delete("remove")
@@ -87,7 +84,6 @@ export class ProductsController {
   @ApiResponse({ status: 201, description: "Product successfully removed" })
   @ApiResponse({ status: 401, description: "Unauthorized access" })
   @ApiResponse({ status: 404, description: "Product not found" })
-
   /**
    * Removes a product.
    *
@@ -97,7 +93,7 @@ export class ProductsController {
    *                              or if the product is not found.
    * @throws {UnauthorizedException} If the user is not an admin.
    */
-  remove(@Query("productCode") productCode: number) {
-    return this.productsService.remove(productCode);
+  async remove(@Query("productCode") productCode: number) {
+    return await this.productsService.remove(productCode);
   }
 }
