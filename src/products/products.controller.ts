@@ -77,7 +77,7 @@ export class ProductsController {
   @Put("update")
   @ApiBearerAuth()
   @ApiOperation({ summary: "Updates a product" })
-  @ApiResponse({ status: 201, description: "Product successfully updated" })
+  @ApiResponse({ status: 200, description: "Product successfully updated" })
   @ApiResponse({ status: 401, description: "Unauthorized access" })
   @ApiResponse({ status: 404, description: "Product not found" })
   @ApiResponse({ status: 500, description: "Internal server error" })
