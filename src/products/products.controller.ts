@@ -7,7 +7,6 @@ import {
   Query,
   Delete,
   InternalServerErrorException,
-  BadRequestException,
   NotFoundException,
   ConflictException,
 } from "@nestjs/common";
