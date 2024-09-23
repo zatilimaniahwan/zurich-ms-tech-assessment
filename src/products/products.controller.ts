@@ -112,7 +112,7 @@ export class ProductsController {
   @Delete("remove")
   @ApiBearerAuth()
   @ApiOperation({ summary: "Removes a product" })
-  @ApiResponse({ status: 201, description: "Product successfully removed" })
+  @ApiResponse({ status: 200, description: "Product successfully removed" })
   @ApiResponse({ status: 401, description: "Unauthorized access" })
   @ApiResponse({ status: 404, description: "Product not found" })
   @ApiResponse({ status: 500, description: "Internal server error" })
