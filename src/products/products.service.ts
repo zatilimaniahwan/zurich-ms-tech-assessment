@@ -1,14 +1,14 @@
 import {
-  BadRequestException,
-  ConflictException,
   Injectable,
+  BadRequestException,
   NotFoundException,
+  ConflictException,
 } from "@nestjs/common";
+import { InjectRepository } from "@nestjs/typeorm";
+import { Repository } from "typeorm";
+import { Product } from "./entities/product.entity";
 import { CreateProductDto } from "./dto/create-product.dto";
 import { UpdateProductDto } from "./dto/update-product.dto";
-import { InjectRepository } from "@nestjs/typeorm";
-import { Product } from "./entities/product.entity";
-import { Repository } from "typeorm";
 
 @Injectable()
 export class ProductsService {
@@ -23,11 +23,11 @@ export class ProductsService {
   ) {}
 
   validateLocation = (location: string) => {
-    // Validate the location value
     const allowedLocations: ProductLocation[] = [
       "West Malaysia",
       "East Malaysia",
     ];
+
     if (!allowedLocations.includes(location as ProductLocation)) {
       throw new BadRequestException("Invalid location value provided");
     }
@@ -38,13 +38,12 @@ export class ProductsService {
    *
    * @param createProductDto - The create product DTO.
    * @returns The created product.
-   * @throws {BadRequestException} If the location value is invalid.
    * @throws {ConflictException} If a product with the same location and product code already exists.
+   * @throws {BadRequestException} If the location is invalid.
    */
   async create(createProductDto: CreateProductDto): Promise<Product> {
     this.validateLocation(createProductDto.location);
 
-    // Check for existing product with the same location and product code
     const existingProduct = await this.productRepository.findOne({
       where: {
         location: createProductDto.location,
@@ -58,26 +57,30 @@ export class ProductsService {
       );
     }
 
-    // Create and save the new product
-    const product = this.productRepository.create(createProductDto);
+    const product = new Product();
+    product.productCode = createProductDto.productCode;
+    product.location = createProductDto.location;
+
+    product.setPrice(createProductDto.price);
+
     return await this.productRepository.save(product);
   }
 
   /**
-   * Gets a product by product code or location.
+   * Retrieves a product by its product code and location.
    *
    * @param productCode - The product code.
    * @param location - The location.
    * @returns The product.
-   * @throws {NotFoundException} If no product code or location is provided,
-   *                              or if the product is not found.
+   * @throws {NotFoundException} If the product is not found.
+   * @throws {BadRequestException} If neither productCode nor location is provided.
    */
   async findOne(
     productCode: number,
     location: ProductLocation
   ): Promise<Product> {
     if (!productCode && !location) {
-      throw new NotFoundException("No product code and location provided");
+      throw new BadRequestException("No product code or location provided");
     }
 
     this.validateLocation(location);
@@ -86,7 +89,9 @@ export class ProductsService {
       where: { productCode, location },
     });
 
-    if (!product) throw new NotFoundException("Product not found");
+    if (!product) {
+      throw new NotFoundException("Product not found");
+    }
 
     return product;
   }
@@ -97,26 +102,30 @@ export class ProductsService {
    * @param productCode - The product code.
    * @param updateProductDto - The update product DTO.
    * @returns The updated product.
-   * @throws {NotFoundException} If no product code is provided,
-   *                              or if the product is not found.
+   * @throws {NotFoundException} If the product is not found.
+   * @throws {BadRequestException} If neither productCode nor location is provided.
    */
   async update(
     productCode: number,
     updateProductDto: UpdateProductDto
   ): Promise<Product> {
-    if (!productCode) throw new NotFoundException("No product code provided");
+    if (!productCode) {
+      throw new BadRequestException("No product code provided");
+    }
 
     this.validateLocation(updateProductDto.location);
 
-    // need to check the location of the product since the productCode is not unique
     const product = await this.productRepository.findOne({
-      where: { productCode, location: updateProductDto.location },
+      where: { productCode },
     });
 
-    if (!product) throw new NotFoundException("Product not found");
+    if (!product) {
+      throw new NotFoundException("Product not found");
+    }
+
+    if (updateProductDto.price) product.setPrice(updateProductDto.price);
 
     Object.assign(product, updateProductDto);
-
     return this.productRepository.save(product);
   }
 
@@ -125,15 +134,17 @@ export class ProductsService {
    *
    * @param productCode - The product code.
    * @returns A promise that resolves if the product was successfully removed.
-   * @throws {NotFoundException} If no product code is provided,
-   *                              or if the product is not found.
+   * @throws {NotFoundException} If no product code is provided, or if the product is not found.
    */
   async remove(productCode: number): Promise<void> {
-    if (!productCode) throw new NotFoundException("No product code provided");
-    const deletedProduct = await this.productRepository.delete({
-      productCode,
-    });
-    if (deletedProduct.affected === 0)
+    if (!productCode) {
+      throw new BadRequestException("No product code provided");
+    }
+
+    const result = await this.productRepository.delete({ productCode });
+
+    if (result.affected === 0) {
       throw new NotFoundException("Product not found");
+    }
   }
 }
