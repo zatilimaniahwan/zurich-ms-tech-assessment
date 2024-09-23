@@ -381,6 +381,30 @@ The tests for the `ProductsController` validate:
   - Status Code: 401
   - Body: Error message indicating "Invalid or expired token".
 
+3. Should throw an `InternalServerErrorException` if an error occurs
+
+- Description: The test case aims to confirm that the create method appropriately handles errors by throwing an `InternalServerErrorException`. This is crucial for ensuring that the API responds correctly in the event of service failures
+
+- Endpoints:
+
+  - `POST /products/create`
+  - `GET /products/get`
+  - `PUT /products/update`
+  - `DELETE /products/remove`
+
+- Request Body
+  ```json
+  {
+    "productCode": 7000,
+    "location": "West Malaysia",
+    "price": 650.55
+  }
+  ```
+- Expected Response:
+
+  - Status Code: 500
+  - Body: Error message.
+
 ### ProductService Unit Tests
 
 The tests cover various functionalities of the `ProductsService`, including creating, fetching, updating, and removing products. Each test case ensures that the service methods behave correctly under different scenarios.
