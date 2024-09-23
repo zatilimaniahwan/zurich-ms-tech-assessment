@@ -7,6 +7,9 @@ import {
   Query,
   Delete,
   InternalServerErrorException,
+  BadRequestException,
+  NotFoundException,
+  ConflictException,
 } from "@nestjs/common";
 import { ProductsService } from "./products.service";
 import { CreateProductDto } from "./dto/create-product.dto";
@@ -24,12 +27,12 @@ export class ProductsController {
   @ApiResponse({ status: 401, description: "Unauthorized access" })
   @ApiResponse({ status: 409, description: "Duplicate product" })
   @ApiResponse({ status: 500, description: "Internal server error" })
-
   /**
    * Creates a product.
    * @param createProductDto - The create product DTO.
    * @returns The created product.
-   * @throws {InternalServerErrorException} If there is an error during creation.
+   * @throws {ConflictException} If a product with the same location and product code already exists.
+   * @throws {InternalServerErrorException} If an unexpected error occurs.
    */
   async create(@Body() createProductDto: CreateProductDto) {
     try {
@@ -39,6 +42,8 @@ export class ProductsController {
         price: response.price.toFixed(2),
       };
     } catch (e) {
+      if (e instanceof ConflictException) throw e;
+
       throw new InternalServerErrorException(e.message);
     }
   }
@@ -46,16 +51,15 @@ export class ProductsController {
   @Get("get")
   @ApiOperation({ summary: "Fetches a product" })
   @ApiResponse({ status: 200, description: "Product found" })
-  @ApiResponse({ status: 401, description: "Unauthorized access" })
   @ApiResponse({ status: 404, description: "Product not found" })
   @ApiResponse({ status: 500, description: "Internal server error" })
-
   /**
-   * Fetches a product.
+   * Retrieves a product by its product code and location.
    * @param productCode - The product code.
    * @param location - The location.
    * @returns The product.
-   * @throws {InternalServerErrorException} If there is an error during fetching.
+   * @throws {NotFoundException} If the product is not found.
+   * @throws {InternalServerErrorException} If an unexpected error occurs.
    */
   async findOne(
     @Query("productCode") productCode: number,
@@ -64,6 +68,8 @@ export class ProductsController {
     try {
       return await this.productsService.findOne(productCode, location);
     } catch (e) {
+      if (e instanceof NotFoundException) throw e;
+
       throw new InternalServerErrorException(e.message);
     }
   }
@@ -75,13 +81,13 @@ export class ProductsController {
   @ApiResponse({ status: 401, description: "Unauthorized access" })
   @ApiResponse({ status: 404, description: "Product not found" })
   @ApiResponse({ status: 500, description: "Internal server error" })
-
   /**
    * Updates a product.
    * @param productCode - The product code.
    * @param updateProductDto - The update product DTO.
    * @returns The updated product.
-   * @throws {InternalServerErrorException} If there is an error during updating.
+   * @throws {NotFoundException} If the product is not found.
+   * @throws {InternalServerErrorException} If an unexpected error occurs.
    */
   async update(
     @Query("productCode") productCode: number,
@@ -97,6 +103,8 @@ export class ProductsController {
         price: response.price.toFixed(2),
       };
     } catch (e) {
+      if (e instanceof NotFoundException) throw e;
+
       throw new InternalServerErrorException(e.message);
     }
   }
@@ -108,17 +116,19 @@ export class ProductsController {
   @ApiResponse({ status: 401, description: "Unauthorized access" })
   @ApiResponse({ status: 404, description: "Product not found" })
   @ApiResponse({ status: 500, description: "Internal server error" })
-
   /**
    * Removes a product.
-   * @param productCode - The product code.
+   * @param productCode - The product code of the product to be removed.
    * @returns A promise that resolves if the product was successfully removed.
-   * @throws {InternalServerErrorException} If there is an error during removing.
+   * @throws {NotFoundException} If the product is not found.
+   * @throws {InternalServerErrorException} If an unexpected error occurs.
    */
   async remove(@Query("productCode") productCode: number) {
     try {
       return await this.productsService.remove(productCode);
     } catch (e) {
+      if (e instanceof NotFoundException) throw e;
+
       throw new InternalServerErrorException(e.message);
     }
   }
