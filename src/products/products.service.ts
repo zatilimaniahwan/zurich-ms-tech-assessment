@@ -34,46 +34,48 @@ export class ProductsService {
   };
 
   /**
-   * Creates a product.
+   * Creates a new product.
    *
    * @param createProductDto - The create product DTO.
    * @returns The created product.
+   * @throws {BadRequestException} If the provided location is not valid. Allowed locations are "West Malaysia" and "East Malaysia".
    * @throws {ConflictException} If a product with the same location and product code already exists.
-   * @throws {BadRequestException} If the location is invalid.
+   * @throws {InternalServerErrorException} If an unexpected error occurs.
    */
   async create(createProductDto: CreateProductDto): Promise<Product> {
-    this.validateLocation(createProductDto.location);
+    const { productCode, location, price } = createProductDto;
+
+    if (!productCode || !location || price == null) {
+      throw new Error("Product code, location and price are required");
+    }
+
+    this.validateLocation(location);
 
     const existingProduct = await this.productRepository.findOne({
-      where: {
-        location: createProductDto.location,
-        productCode: createProductDto.productCode,
-      },
+      where: { location, productCode },
     });
 
     if (existingProduct) {
       throw new ConflictException(
-        "Product with this location and product code already exists"
+        `Product with location ${location} and product code ${productCode} already exists`
       );
     }
 
     const product = new Product();
-    product.productCode = createProductDto.productCode;
-    product.location = createProductDto.location;
-
-    product.setPrice(createProductDto.price);
+    product.productCode = productCode;
+    product.location = location;
+    product.setPrice(price);
 
     return await this.productRepository.save(product);
   }
 
   /**
    * Retrieves a product by its product code and location.
-   *
    * @param productCode - The product code.
    * @param location - The location.
    * @returns The product.
-   * @throws {NotFoundException} If the product is not found.
    * @throws {BadRequestException} If neither productCode nor location is provided.
+   * @throws {NotFoundException} If the product is not found.
    */
   async findOne(
     productCode: number,
@@ -98,19 +100,25 @@ export class ProductsService {
 
   /**
    * Updates a product.
-   *
    * @param productCode - The product code.
    * @param updateProductDto - The update product DTO.
    * @returns The updated product.
+   * @throws {BadRequestException} If no product code is provided.
+   * @throws {Error} If location and price are not provided.
    * @throws {NotFoundException} If the product is not found.
-   * @throws {BadRequestException} If neither productCode nor location is provided.
    */
   async update(
     productCode: number,
     updateProductDto: UpdateProductDto
   ): Promise<Product> {
+    const { location, price } = updateProductDto;
+
     if (!productCode) {
       throw new BadRequestException("No product code provided");
+    }
+
+    if (!location || price == null) {
+      throw new Error("Location and price are required");
     }
 
     this.validateLocation(updateProductDto.location);
@@ -131,10 +139,10 @@ export class ProductsService {
 
   /**
    * Removes a product.
-   *
-   * @param productCode - The product code.
+   * @param productCode - The product code of the product to be removed.
    * @returns A promise that resolves if the product was successfully removed.
-   * @throws {NotFoundException} If no product code is provided, or if the product is not found.
+   * @throws {BadRequestException} If no product code is provided.
+   * @throws {NotFoundException} If the product is not found.
    */
   async remove(productCode: number): Promise<void> {
     if (!productCode) {
