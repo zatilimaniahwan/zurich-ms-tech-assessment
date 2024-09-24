@@ -19,6 +19,15 @@ import { ApiBearerAuth, ApiOperation, ApiResponse } from "@nestjs/swagger";
 export class ProductsController {
   constructor(private readonly productsService: ProductsService) {}
 
+  /**
+   * Format a price by rounding it to two decimal places.
+   * @param price - The price to format.
+   * @returns The formatted price.
+   */
+  formatPrice(price: number) {
+    return price.toFixed(2);
+  }
+
   @Post("create")
   @ApiBearerAuth()
   @ApiOperation({ summary: "Creates a product" })
@@ -38,7 +47,7 @@ export class ProductsController {
       const response = await this.productsService.create(createProductDto);
       return {
         ...response,
-        price: response.price.toFixed(2),
+        price: this.formatPrice(response.price),
       };
     } catch (e) {
       if (e instanceof ConflictException) throw e;
@@ -99,7 +108,7 @@ export class ProductsController {
       );
       return {
         ...response,
-        price: response.price.toFixed(2),
+        price: this.formatPrice(response.price),
       };
     } catch (e) {
       if (e instanceof NotFoundException) throw e;
